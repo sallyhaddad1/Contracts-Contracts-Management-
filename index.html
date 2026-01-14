@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contracts & Contracts Management (Training)  </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+   <style>
+       
+        body {
+            font-family: 'Inter', 'Tajawal', sans-serif; 
+            background-color: #f1f5f9; 
+            overscroll-behavior: none;
+            margin: 0;
+        }
+        .slide {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            height: 100%;
+            overflow: hidden;
+        }
+		
+        .slide-visible {
+            display: block;
+        }
+        .slide-hidden {
+            display: none !important;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        .quiz-option.correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: 600;
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+            font-weight: 600;
+        }
+        .quiz-option:disabled:not(.correct):not(.incorrect) {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .quiz-option:disabled {
+            cursor: not-allowed;
+        }
+        .slide-content-wrapper {
+            height: calc(100% - 4rem - 1px);
+            overflow-y: auto;
+            padding-bottom: 2rem;
+        }
+        .slide-content-wrapper::-webkit-scrollbar { width: 8px; }
+        .slide-content-wrapper::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+        .slide-content-wrapper::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        .slide-content-wrapper::-webkit-scrollbar-thumb:hover { background: #1d4ed8; }
+        #video-modal-content { width: 90%; max-width: 900px; }
+        #youtube-iframe { aspect-ratio: 16 / 9; width: 100%; height: auto; }
+        .slide-header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(241, 245, 249, 0.95);
+            backdrop-filter: blur(5px);
+            padding-top: 0.25rem;
+            padding-bottom: 0.75rem;
+            z-index: 5;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        /* Placeholder style for missing images */
+        img.placeholder-image {
+            background-color: #e2e8f0;
+            border: 2px dashed #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-weight: bold;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            position: relative;
+            /* توسيط المحتوى داخل body الجديد */
+            margin: 50px auto; 
+        }
+
+        .content-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .training-card {
+            background-color: #0d1b3f;
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            width: 48%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+        }
+
+        .card-header {
+            position: absolute;
+            top: -50px;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .image-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: white;
+            border: 5px solid #ab141c;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            opacity: 1; 
+        }
+
+        .list {
+            list-style: none;
+            padding: 0;
+            margin-top: 40px;
+            text-align: right;
+            font-size: 1.1em;
+            width: 100%;
+            padding-right: 20px;
+        }
+
+        .list li {
+            margin-bottom: 15px;
+        }
+
+        .timeline-bar {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background-color: #ab141c;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 5px;
+        }
+
+        .timeline-text {
+            color: white;
+            font-weight: bold;
+            padding: 0 20px;
+            text-transform: uppercase;
+            font-size: 1.2em;
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .left-arrow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -20px;
+            width: 0;
+            height: 0;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-right: 20px solid #ab141c;
+        }
+
+        .right-arrow::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -20px;
+            width: 0;
+            height: 0;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-left: 20px solid #ab141c;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md w-full p-4 z-10 flex justify-between items-center flex-shrink-0 border-b border-slate-200">
+        <div class="flex items-center min-w-0"> 
+            <div class="w-10 h-10 bg-blue-800 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                <!-- Icon representing Industrial Equipment -->
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a8 8 0 11-14.856 0M12 21a8 8 0 100-16 8 8 0 000 16z"></path></svg>
+            </div>
+            <div class="ml-3 truncate">
+                <h1 class="text-lg md:text-xl font-bold text-slate-900">Contracts & Contracts Management (Training)</h1>
+            </div>
+        </div>
+        <div class="text-sm font-medium text-slate-500 flex-shrink-0 ml-2 bg-slate-100 px-3 py-1 rounded-full" id="slide-counter">Slide 1 / 18</div>
+    </header>
+
+    <!-- Main Slide Container -->
+    <main id="slide-container" class="flex-1 overflow-hidden p-4 md:p-8 lg:p-12 relative">
+        
+        <!-- Slide 0: Title -->
+       <section id="slide-0" class="slide slide-visible flex flex-col justify-center items-center text-center p-4">
+    <div class="bg-white p-10 md:p-16 rounded-2xl shadow-xl max-w-4xl w-full border-t-8 border-blue-800">
+        <span class="block text-sm font-bold text-blue-600 uppercase tracking-widest mb-2">Target Engineering Construction - National Emirates Training</span>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6">Contracts & Contracts Management (Training)
+ <br/></h1>
+        <div class="w-24 h-1 bg-yellow-500 mx-auto mb-8 rounded-full"></div>
+        <p class="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">Company – Target Engineering Construction <br> Company – Sole Proprietorship LLC <br>
+Division -	POGD (Power, Oil & Gas Division)<br>
+Department -	Contracts <br><br>
+A comprehensive competency-based course on industrial stationary assets, from Heat Exchangers to Separation Columns.
+		<br>
+		
+		</p>
+        
+       <button id="start-btn" class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
+    Start Course
+</button>
+    </div>
+</section>
+
+        <!-- Slide 1: AGENDA  -->
+<section id="slide-1" class="slide">
+    <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">AGENDA </h2>
+    <div class="slide-content-wrapper flex items-center justify-center" style="width: 90%; height: 90%;">
+        <div class="grid grid-cols-1 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500">
+                <div class="flex-1">
+                    <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+                        <p class="text-slate-700 text-lg">
+                            <strong>
+                                1. Brief understanding on functionality and responsibility of Contract Department <br>
+                                2. Basic understanding of Contracts & Contract Management<br>
+                                3. Brief understanding of Contract Life Cycle<br>
+                                4. IMS Procedures – Contract Review<br>
+                                5. Review, Comments, Feedbacks 
+                            </strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <!-- Slide 2:  Responsibilities-->
+ <section id="slide-2" class="slide">
+            <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Responsibilities </h4>
+                <p class="text-slate-700 text-lg">
+- Overall	Responsible for	all	contractual	and	technocommercial issues during tenders and execution of the project. 
+ Ensures  that  tender  compilation  and  bid submittal are effected , through the joint participation of the divisions
+ involved for multi-discipline / multi-trades related tenders.<br>
+ - Responsible	for	reviewing	contractual term and conditions	vis-	vis	FIDIC	and	normally	acceptable
+practices;	minimizing	risk	to	company	and	advising
+qualifications	during	bid	submissions,	if any.	During
+actual  contract  execution,  responsible  to  administer contract;  assist  Site  Management  in  addressing  - identifying-  out  of  contract  issues;  resolving  these  in company  favour,  and  project  close  out  including variations.
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Procedure </h4>
+                <p class="text-slate-700 text-lg">
+<strong>The	main	activities	involved	in	the	Contracts Department include :</strong><br>
+- Review of Contr ct Agreement during tender stage<br>
+- Review of Contract Agreement on Award<br>
+- Analysis Risk and Opportunities<br>
+- Contract Administration<br>
+- Assisting	Divisions	in	Project	Closeout,	Handover and Claims <br>
+- Coordinating	and	Assisting in	Major	Project
+execution<br>
+- Special Assignments
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+                </div>
+            </div>
+</section>
+
+ <!-- Slide 3: Objective of Contract Management-->
+     <section id="slide-3" class="slide">
+       <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Objective of Contract Management </h4>
+                <p class="text-slate-700 text-lg">
+Contract	management	integrates	the	processes
+used	to	manage	contracts	throughout	the
+contract	life	cycle	while	ensuring	customer
+satisfaction.	It	includes	job	tasks	involved	in
+managing  deliverables,  deadlines,  and  contract terms  and  conditions  while  ensuring  customer satisfaction.
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Contract Life Cycle </h4>
+                <p class="text-slate-700 text-lg">
+- Pre Award –
+Develop Solicitation – Solicitation Develop Offer - Offer
+<br>
+- Award –
+Form Contract - Contract
+<br>
+- Post Award –
+Perform Contract –Contract Performance Close Contract – Closes Contract
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+                </div>
+            </div>
+        </section>	
+
+        <!-- Slide 4:Definitions -->
+      <section id="slide-4" class="slide">
+           <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Definitions </h4>
+                <p class="text-slate-700 text-lg">
+<strong>Contract	management</strong> is	the	process	of	managing contract creation, execution, and analysis to maximize
+operational	and	financial	performance	at an
+organization,	all	while	reducing	financial	risk.<br>
+A <strong>contract </strong> is a mutually binding, legal relationship that obligates the seller 
+to furnish supplies or services and the buyer to provide consideration for them.
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Essential Elements of a Contract </h4>
+                <p class="text-slate-700 text-lg">
+<strong> ** In order for a contract to be valid, it must contain four essential elements:<br></strong>
+- Demonstration of mutual agreement through <br>
+- (1) an offer and (2) acceptance <br>
+- (3) Consideration (i.e., something of value—typically 	money), and <br>
+- (4) Intent to create a legal relationship.<br>
+<strong> ** The legal relationship is demonstrated through the contract’s:<br></strong>
+- Legal purpose (a contract for an illegal act is not valid), and<br>
+- Capacity of the parties (the contracting parties must have the legal<br>
+capacity to enter into a contract).
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+                </div>
+            </div>
+        </section>	
+
+        <!-- Slide 5: Types of Contracts-->
+		  <section id="slide-4" class="slide">
+               <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Types of Contracts
+ </h4>
+                <p class="text-slate-700 text-lg">
+				
+<strong>Bilateral Contract</strong> Firm-fixed-price contracts, as the name implies, establish a price that is not subject to any
+adjustment based on the contractor’s actual cost to perform the contract.
+
+<br>
+<strong>Unilateral Contract  </strong> Only one party has made a promise and is obligated to perform. An example of this may be a contract that promises a monetary reward to find a missing pet. No one is obligated by that contract to search for that pet, but if the pet is found, the party who promised the reward is obligated to pay.
+<br>
+<strong>Express Contract  </strong> The contract terms are stated in either written or spoken
+words and are assented to by both parties.
+
+<br>
+<strong>Implied Contract </strong>  Sometimes called “implied in fact,” this contract is one in which the contract terms are wholly or partly inferred from conduct or surrounding circumstance.
+<br>
+<strong>Quasi Contract   </strong>   Sometimes called “implied in law,” this contract comprises obligations imposed by law to prevent the unjust enrichment of one person at another’s expense.
+
+
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Contract Types </h4>
+                <p class="text-slate-700 text-lg">
+<strong>Fixed-price contracts</strong>  Most contracts are bilateral, meaning they consist of reciprocal promises. Under bilateral contracts, each party has made a promise, has an obligation to perform, and has expectations that the other party will perform. An example is a contract where one party promises to provide services and the other party promises to pay an agreed-upon amount of money to receive those services.
+<br>
+<strong>Cost-reimbursement contracts
+  </strong> Only one party has made a promise and is obligated to perform. An example of this may be a contract that promises a monetary reward to find a missing pet. No one is obligated by that contract to search for that pet, but if the pet is found, the party who promised the reward is obligated to pay.
+<br>
+<strong>Incentive contracts </strong> Incentive contracts, contracts containing various forms of incentives, may be appropriate when there is a desire or need to provide a contractor/ seller with additional motivation to attain specific acquisition objectives that would be unlikely to be attained without the incentives.
+
+
+<br>
+<strong>Other contract types </strong> <br>
+ Time-and-Materials (T&M) Contracts<br>
+T&M contracts are used to buy goods or services based on direct labor hours and the cost of materials required for contract performance.
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+                </div>
+            </div>
+        </section>	
+
+		
+		 <!-- Slide 6: Pre-Award Life Cycle Phase-->
+ <section id="project-details" class="slide">
+                  <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Pre-Award Life Cycle Phase
+ </h4>
+                <p class="text-slate-700 text-lg">
+				
+<strong>Pre-Award  is  the  first  phase  of  the  contract  life  cycle  and includes the processes for buyers to produce solicitations and sellers to prepare offers. The pre-award life cycle consists of two domains  that  produce  significant  contract  management outcomes:
+</strong> 
+<br>
+<br>
+<strong>Develop Solicitation  </strong> The process for the buyer of determining customer requirements and then describing and explaining the requirements and other relevant terms and conditions through a solicitation to the sellers.<br>
+
+<strong>Develop  Offer </strong> The  process  for  the  seller  of  developing business practices and strategies to respond to solicitations with the  intent  of  winning  contracts  and  meeting  performance requirements.
+
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Award Life Cycle Phase </h4>
+                <p class="text-slate-700 text-lg">
+- The second phase of the contract life cycle is Award. The 	award process involves all the work by both the buyer 	and seller that produces an awarded contract.
+<br>
+- There is one domain in the award phase: Form Contract. 	The job tasks and competencies of the Form Contract 	domain produce the contract.
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+                </div>
+            </div>
+</section>
+		
+	 <!-- Slide 7: Conditions of Contract- General Conditions -->
+        <section id="slide-7" class="slide">
+         <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Conditions of Contract- General Conditions
+ </h4>
+                <p class="text-slate-700 text-lg">
+				
+1. GENERAL PROVISIONS<br>
+2. THE EMPLOYER<br>
+3. THE EMPLOYER’S ADMINISTRATION<br>
+4. THE CONTRACTOR<br>
+5. DESIGN<br>
+6. STAFF AND LABOUR<br>
+7. PLANT, MATERIALS AND WORKMANSHIP<br>
+8. COMMENCEMENT, DELAYS AND SUSPENSION<br>
+9. TESTS ON COMPLETION<br>
+10. EMPLOYER’S TAKING OVER<br>
+11. DEFECTS LIABILITY<br>
+12. TESTS AFTER COMPLETION<br>
+13. VARIATIONS AND ADJUSTMENTS<br>
+14. CONTRACT PRICE AND PAYMENT<br>
+15. TERMINATION BY EMPLOYER<br>
+16. SUSPENSION AND TERMINATION BY CONTRACTOR<br>
+17. CARE OF THE WORKS AND INDEMNITIES<br>
+18. INSURANCE<br>
+19. FORCE MAJEURE<br>
+20. CLAIMS, DISPUTES AND ARBITRATION
+ 
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Post-Award Life Cycle Phase </h4>
+                <p class="text-slate-700 text-lg">
+<strong>Perform contract is the process of establishing and maintaining   communications   and   tracking   and documenting contract performance.
+ The value added by	this	process	is	ensuring	compliance	with contractual terms	and
+conditions	during	contract performance through contract		closeout	or termination.
+</strong> <br><br>
+Perform contract is composed of four competencies:
+<br>
+1. Administer contract <br>
+2. Ensure quality<br>
+3. Subcontract management<br>
+4. Manage changes
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Important elements of Administer Contract-->
+             <section id="project-flow-scope" class="slide">
+            <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Important elements of Administer Contract
+
+ </h4>
+                <p class="text-slate-700 text-lg">
+				
+1. Using effective communication<br>
+2. Attending the post-award kickoff meeting<br>
+3. Conducting status review meetings<br>
+4. Preparing written status reports<br>
+5. Observing and monitoring performance<br>
+6. Documenting performance and providing feedback to the seller, and<br>
+7. Resolving requests for equitable adjustment and claims.
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Subcontract Management </h4>
+                <p class="text-slate-700 text-lg">
+is	the	process	of contract	management	of	subcontracts,	with	the
+prime	contractor	being	responsible	for	the
+performance of its supply chain.
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+					       <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Manage Changes </h4>
+                <p class="text-slate-700 text-lg">
+After   contract   award,   buyers   and   sellers frequently   discover   contract   changes   are necessary. Changes must be managed to ensure
+configuration		control		of	the	contract	and subsequent	contract	performance.	A	contract
+change is necessary when the existing contract does not reflect what needs to be accomplished. Such contract changes may be necessary due to changed or unforeseen circumstances, conduct of
+the	parties,	and/or	changes	in	buyer requirements, including funding limitations.
+
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+					       <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Contract Closeout </h4>
+                <p class="text-slate-700 text-lg">
+Contract closeout is the process of ensuring all performance has been accomplished, final payment has been made,
+ and the contract has been reconciled.<br><br>
+These required tasks normally include:<br>
+1. Verifying all required goods or services have been received and accepted;<br>
+2. Verifying all contractor invoices have been received and paid;<br>
+3. Returning or disposing of any buyer-furnished property;<br>
+4. Closing subcontracts by the seller;<br>
+5. Agreeing that no claims, issues, or unresolved matters exist;<br>
+6. Obtaining a final report of patents and royalties;<br>
+7. Signing a formal notice of contract completion;<br>
+8. Lesson learnt
+
+
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+                </div>
+            </div>
+</section>
+
+
+        <!-- Slide 9: PROJECT BACKGROUND & SCOPE -->
+            <section id="slide-9" class="slide">
+			
+			  <div class="slide-content-wrapper flex flex-col gap-6">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">PROJECT BACKGROUND & SCOPE </h2>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                     <div class="flex-1 flex justify-center">
+                            <div class="relative w-full max-w-xl aspect-[3/4] bg-white rounded-lg shadow-inner border border-slate-300 overflow-hidden">
+                                 <img src="imeges/Picture1.jpg"
+								 alt="Slide 18: Fired Heater Cutaway"  class="zoomable w-full h-full object-contain cursor-zoom-in">
+                                 <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-4 text-slate-400 bg-slate-50">
+                                     <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+				
+                </div>
+				</div>
+        </section>
+
+ <!-- Slide 10: PROJECT OBJECTIVE -->
+                   <section id="slide-10" class="slide">
+                    <div class="slide-content-wrapper flex flex-col gap-6">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">PROJECT BACKGROUND & SCOPE </h2>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                     <div class="flex-1 flex justify-center">
+                            <div class="relative w-full max-w-xl aspect-[3/4] bg-white rounded-lg shadow-inner border border-slate-300 overflow-hidden">
+                                 <img src="imeges/Picture2.jpg"
+								 alt="Slide 18: Fired Heater Cutaway"  class="zoomable w-full h-full object-contain cursor-zoom-in">
+                                 <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-4 text-slate-400 bg-slate-50">
+                                     <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+				
+                </div>
+				</div>
+</section>
+      
+		<!-- Slide 12: TARGET QUALITY POLICY -->
+                 <section id="slide-12" class="slide">
+             <div class="slide-content-wrapper flex flex-col gap-6">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">PROJECT BACKGROUND & SCOPE </h2>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                     <div class="flex-1 flex justify-center">
+                            <div class="relative w-full max-w-xl aspect-[3/4] bg-white rounded-lg shadow-inner border border-slate-300 overflow-hidden">
+                                 <img src="imeges/Picture3.jpg"
+								 alt="Slide 18: Fired Heater Cutaway"  class="zoomable w-full h-full object-contain cursor-zoom-in">
+                                 <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-4 text-slate-400 bg-slate-50">
+                                     <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+				
+                </div>
+				</div>
+        </section>
+		
+		 <!-- Slide 13:TARGET QUALITY MANAGEMENT SYSTEM-->
+           <section id="slide-13" class="slide">
+             <div class="slide-content-wrapper flex flex-col gap-6">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">PROJECT BACKGROUND & SCOPE </h2>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                     <div class="flex-1 flex justify-center">
+                            <div class="relative w-full max-w-xl aspect-[3/4] bg-white rounded-lg shadow-inner border border-slate-300 overflow-hidden">
+                                 <img src="imeges/Picture4.jpg"
+								 alt="Slide 18: Fired Heater Cutaway"  class="zoomable w-full h-full object-contain cursor-zoom-in">
+                                 <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-4 text-slate-400 bg-slate-50">
+                                     <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+				
+                </div>
+				</div>
+        </section>
+		
+		<!-- Slide 14: QUALITY -->
+       <section id="slide-14" class="slide">
+             <div class="slide-content-wrapper flex flex-col gap-6">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">PROJECT BACKGROUND & SCOPE </h2>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                     <div class="flex-1 flex justify-center">
+                            <div class="relative w-full max-w-xl aspect-[3/4] bg-white rounded-lg shadow-inner border border-slate-300 overflow-hidden">
+                                 <img src="imeges/Picture5.jpg"
+								 alt="Slide 18: Fired Heater Cutaway"  class="zoomable w-full h-full object-contain cursor-zoom-in">
+                                 <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-4 text-slate-400 bg-slate-50">
+                                     <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+				
+                </div>
+				</div>
+        </section>
+		
+		<!-- Slide 15: PROJECT QUALITY ASSURANCE -->
+      <section id="slide-15" class="slide">
+	             <div class="slide-content-wrapper flex flex-col gap-6">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">PROJECT BACKGROUND & SCOPE </h2>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                     <div class="flex-1 flex justify-center">
+                            <div class="relative w-full max-w-xl aspect-[3/4] bg-white rounded-lg shadow-inner border border-slate-300 overflow-hidden">
+                                 <img src="imeges/Picture6.jpg"
+								 alt="Slide 18: Fired Heater Cutaway"  class="zoomable w-full h-full object-contain cursor-zoom-in">
+                                 <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-4 text-slate-400 bg-slate-50">
+                                     <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+				
+                </div>
+				</div>
+        </section>
+		
+			 <!-- Slide 16:PROJECT QUALITY ASSURANCE-->
+  <section id="slide-16" class="slide">
+         <div class="slide-content-wrapper flex flex-col gap-6">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 slide-header">PROJECT BACKGROUND & SCOPE </h2>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">                    
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                     <div class="flex-1 flex justify-center">
+                            <div class="relative w-full max-w-xl aspect-[3/4] bg-white rounded-lg shadow-inner border border-slate-300 overflow-hidden">
+                                 <img src="imeges/Picture7.jpg"
+								 alt="Slide 18: Fired Heater Cutaway"  class="zoomable w-full h-full object-contain cursor-zoom-in">
+                                 <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-4 text-slate-400 bg-slate-50">
+                                     <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+				
+                </div>
+				</div>
+        </section>
+		
+	<!-- Slide 17: ENGINEERING QUALITY SYSTEM -->
+      <section id="slide-17" class="slide">
+          <div class="slide-content-wrapper" style="width: 90%; height: 90%;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Air Cooled -->
+                      <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Guarantees/Bonds
+
+ </h4>
+                <p class="text-slate-700 text-lg">
+				
+<strong>1. Advance Bank Guarantee/ Down Payment Guarantee;</strong>
+<br>
+Under an advance payment bank guarantee, the guarantor undertakes to repay an advanced payment that the principal has received in the event that the principal does not fulfill the terms of its contract.
+<br><br>
+<strong>2. Performance Bank Guarantee;</strong>
+<br>
+Performance guarantee issued by a bank and protects the beneficiary against the failure of
+the principal to meet its contractual obligations in the underlying contract.
+<br><br>
+<strong>3. Retention Money Guarantee (could be replaced with retention amount)</strong>
+<br>
+Retention Money Guarantee is a written document issued to the owner or the buyer from the Bank to guarantee that applicant will continue to fulfill contract obligation after withdrawing final payment of the contract price in advance, at the request of construction contractor or supplier.
+<br><br>
+<strong>4. Parent Company Guarantee (an undertaking by Contractor’s Parent Company) ;</strong>
+<br>
+A parent company guarantee is typically a promise by the parent company to stand behind the contractor and to be responsible for the contractor’s default of its contractual obligations. Alternatively, it may be limited to an obligation to step in and perform the contractor's obligations. In either case, the parent company's liability may be capped.
+
+ </p>
+            </div>
+        </div> 
+                      </div>
+
+                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500" >
+                         <!-- Image Container -->
+                        <div class="flex-1">
+            <div class="bg-white p-9 rounded-xl shadow-lg border border-slate-200">
+			            <h4 class="text-3xl font-bold text-slate-800 mb-2 slide-header">Insurances/Indemnifications
+ </h4>
+                <p class="text-slate-700 text-lg">
+<strong>1. Workmen’s compensation/Employers Liability;</strong>
+<br>
+Covers statutory liability to employees for work related death, injury or illness.
+<br><br>
+<strong>2. Motor vehicle third party and passenger liability;</strong>
+<br>
+It covers only your legal liability for the damage you may cause to a third party – bodily injury, death and damage to third party property – while using your vehicle
+
+<br><br>
+<strong>3. Contractor Plant & Equipment;</strong>
+
+<br>
+The cover is designed for Mobile Plant & Equipment used in construction sites against sudden, accidental and unforeseen loss or damage but excluding mechanical/electrical breakdown. The same criteria apply as in the case of Machinery Insurance.
+<br><br>
+<strong>4. General Third Party Insurance;<br></strong>
+General liability insurance helps pay expenses related to third- party injuries and property damage.<br>
+<br>
+<strong>5. VESSEL hull and machinery insurance, (if applicable);<br></strong>
+<br>
+<strong>6. Professional indemnity;<br></strong>
+Professional Indemnity insurance is to cover your legal liability for the advice and design that you provide and also ensures protection against liability for breach of professional duty that you may face when providing a service.
+<br><br>
+
+<strong>7. Contractor All Risk (CAR) and/or Erection All Risk (EAR);<br></strong>
+The  policy  has  two  Sections  to  cater  for  all  contingencies associated with Contract works.<br>
+<strong>- Section I : </strong>Material Damage This Section covers loss or damage
+to  contract  works	and  other  ancillary  facilities  on comprehensive basis<br>
+<strong>- Section  II : </strong> Third  Party  Liability  This  Section  covers  legal liabilities to third parties arising out of accidental bodily injury or property damage in connection with contract works.
+
+
+ </p>
+            </div>
+        </div> 
+                      </div> 
+                </div>
+            </div>
+            
+        </section>
+		
+	  
+
+<!-- Slide 38: Conclusion -->
+        <section id="slide-38" class="slide flex flex-col justify-center items-center text-center p-4">
+             <div class="bg-white p-10 md:p-16 rounded-2xl shadow-xl max-w-4xl w-full">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">✓</div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6">Course Complete</h1>
+                <p class="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">Thank You</p>
+                <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-full shadow-lg">
+                    Restart Course
+                </button>
+            </div>
+        </section>
+		
+		
+   </main>
+
+    <!-- Footer: Nav -->
+  <footer class="bg-white shadow-inner p-4 z-10 flex-shrink-0 border-t border-slate-200">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <button id="prev-btn" class="bg-white border border-slate-300 text-slate-700 font-bold py-2 px-6 rounded-lg shadow-sm hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Previous
+        </button>
+        <div class="flex-1 mx-4">
+            <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%;"></div> 
+            </div>
+        </div>
+        <button id="next-btn" class="bg-blue-800 text-white font-bold py-2 px-6 rounded-lg shadow hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Next
+        </button>
+    </div>
+</footer>
+
+  <!-- Zoom Overlay -->
+<div id="zoomOverlay"
+     class="hidden fixed inset-0 bg-black/80 flex items-center justify-center overflow-hidden z-50">
+    <img id="zoomedImage"
+         class="max-w-[90%] max-h-[90%] rounded-lg transition-transform cursor-zoom-out"
+         src="">
+</div>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+        const slideCounter = document.getElementById('slide-counter');
+        const progressBar = document.getElementById('progress-bar');
+        
+        // ** إضافة متغير حالة البدء وربط زر Start **
+        let isStarted = false; 
+        const startButton = document.getElementById('start-btn'); // يجب أن يكون هذا الـ ID موجوداً في HTML الشريحة 0
+        // ... (بقية المتغيرات)
+
+        const videoModal = document.getElementById('video-modal');
+        const videoModalContent = document.getElementById('video-modal-content');
+        const youtubeIframe = document.getElementById('youtube-iframe');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const playVideoBtns = document.querySelectorAll('.play-video-btn');
+
+        function showSlide(index) {
+            if (index < 0 || index >= totalSlides) return;
+            
+            slides[currentSlideIndex].classList.remove('slide-visible');
+            slides[currentSlideIndex].classList.add('slide-hidden');
+            
+            slides[index].classList.remove('slide-hidden');
+            slides[index].classList.add('slide-visible');
+            
+            currentSlideIndex = index;
+            updateNavigation();
+            
+            // Scroll top content
+            const content = slides[index].querySelector('.slide-content-wrapper');
+            if (content) content.scrollTop = 0;
+        }
+
+        function updateNavigation() {
+            slideCounter.textContent = `Slide ${currentSlideIndex + 1} / ${totalSlides}`;
+            const progressPercentage = ((currentSlideIndex + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            
+            prevButton.disabled = (currentSlideIndex === 0);
+            
+            // ** المنطق المُعدّل لزر Next **
+            // يتم التعطيل فقط إذا: 
+            // 1. كنا في الشريحة الأخيرة.
+            // 2. أو كنا في الشريحة 0 ولم نضغط على Start بعد.
+            const shouldBeDisabled = (currentSlideIndex === totalSlides - 1) || 
+                                     (currentSlideIndex === 0 && !isStarted);
+                                     
+            nextButton.disabled = shouldBeDisabled;
+        }
+
+        prevButton.addEventListener('click', () => showSlide(currentSlideIndex - 1));
+        
+        // ** ملاحظة: زر Next سيتفعل تلقائياً بعد الانتقال للشريحة 1 **
+        nextButton.addEventListener('click', () => showSlide(currentSlideIndex + 1));
+
+        // ** مستمع حدث زر Start (التعديل الرئيسي) **
+        if (startButton) {
+            startButton.addEventListener('click', () => {
+                isStarted = true; // تفعيل حالة البدء
+                
+                // الانتقال إلى الشريحة التالية (الشريحة 1)
+                showSlide(currentSlideIndex + 1);
+                
+                // إخفاء زر Start بعد بدء الدورة
+                // إذا لم تكن تريد إخفاءه، احذف السطر التالي
+                startButton.classList.add('hidden'); 
+            });
+        }
+        
+        // ... (بقية أكواد الـ Video Modals والـ Zoom)
+
+        const zoomableImages = document.querySelectorAll(".zoomable");
+        const overlay = document.getElementById("zoomOverlay");
+        const zoomImg = document.getElementById("zoomedImage");
+
+        let scale = 1;
+        let isDragging = false;
+        let startX, startY;
+        let translateX = 0;
+        let translateY = 0;
+
+        zoomableImages.forEach(img => {
+            img.addEventListener("click", () => {
+                zoomImg.src = img.src;
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                zoomImg.style.transform = `translate(0px, 0px) scale(1)`;
+                overlay.classList.remove("hidden");
+            });
+        });
+
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) {
+                overlay.classList.add("hidden");
+            }
+        });
+
+        zoomImg.addEventListener("wheel", (e) => {
+            e.preventDefault();
+            scale += e.deltaY < 0 ? 0.1 : -0.1;
+            if (scale < 1) scale = 1;
+            if (scale > 5) scale = 5;
+            zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        });
+
+        zoomImg.addEventListener("mousedown", (e) => {
+            if (scale <= 1) return;
+            isDragging = true;
+            zoomImg.style.cursor = "grabbing";
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+        });
+
+        zoomImg.addEventListener("mousemove", (e) => {
+            if (!isDragging) return;
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        });
+
+        zoomImg.addEventListener("mouseup", () => {
+            isDragging = false;
+            zoomImg.style.cursor = "grab";
+        });
+
+        zoomImg.addEventListener("mouseleave", () => {
+            isDragging = false;
+        });
+        
+        // تهيئة البدء
+        updateNavigation();
+    });
+</script>
+</body>
+</html>
